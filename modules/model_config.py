@@ -2,8 +2,8 @@ from modules.logger import get_logger
 from dotenv import load_dotenv
 import os
 import requests
-from modules.config import MODEL_NAME
-from langchain_huggingface import HuggingFacePipeline, ChatHuggingFace
+from modules.config import MODEL_NAME,EMBED_MODEL_NAME
+from langchain_huggingface import HuggingFacePipeline, ChatHuggingFace, HuggingFaceEmbeddings
 
 logger = get_logger("model-config-logger")
 
@@ -42,5 +42,27 @@ def llm_model(model_name=MODEL_NAME):
 
     except Exception as e:
         logger.error(f"Error in model config: {e}")
+        return None
+    
+def embedding_model (model_name=EMBED_MODEL_NAME):
+    
+    try:
+        if not model_name:
+            raise ValueError("embedding model name is empty or none")
+        
+        embed_model = HuggingFaceEmbeddings(
+            model_name = model_name,
+            
+        )
+    
+        logger.info(f"{model_name} launched successfull")
+        return embed_model
+        
+    except ValueError as e:
+        logger.error(f"Value error: {e}")
+        return None
+
+    except Exception as e:
+        logger.error(f"Error in embedding model: {e}")
         return None
 
