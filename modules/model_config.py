@@ -4,7 +4,9 @@ import os
 from modules.config import MODEL_NAME,EMBED_MODEL_NAME
 from langchain_huggingface import HuggingFacePipeline, ChatHuggingFace, HuggingFaceEmbeddings
 import faiss
-
+from langchain_community.vectorstores import FAISS
+from langchain_community.docstore.in_memory import InMemoryDocstore
+from langchain_core.documents import Document
 
 logger = get_logger("model-config-logger")
 
@@ -71,13 +73,27 @@ embedding = embedding_model()
 dimension = len(embedding.embed_query("test"))
 
 
-def create_vector_index(texts, embedding_model):
+def create_vector_store(chunks, embedding_model):
     
     try:
-        d = len(texts)
+
         index = faiss.IndexHNSWFlat(dimension, 32)
         index.hnsw.efConstruction = 200
         index.hnsw.efSearch = 50
+        
+        docstore = InMemoryDocstore({})
+        
+        vectorstore = FAISS(
+            embedding_function=embedding_model,
+            index=index,
+            docstore=docstore,
+            index_to_docstore_id={}
+        )
+        
+        docs = [Document(page_content=chunk) for chunk in chunks]
+        vectorstore.add_documents(docs)
+        
+        return vectorstore
         
     except ValueError as e:
         logger.error(f"Value error: {e}")
