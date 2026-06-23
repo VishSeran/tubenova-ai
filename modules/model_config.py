@@ -76,6 +76,9 @@ dimension = len(embedding.embed_query("test"))
 def create_vector_store(chunks, embedding_model):
     
     try:
+        
+        if not dimension or dimension == 0:
+            raise ValueError(f"dimension value is: {dimension}")
 
         index = faiss.IndexHNSWFlat(dimension, 32)
         index.hnsw.efConstruction = 200
@@ -101,4 +104,23 @@ def create_vector_store(chunks, embedding_model):
     
     except Exception as e:
         logger.error(f"Error in create vector index: {e}")
+        return None
+    
+def retrieve(query, vectorstore, k=4):
+    
+    try:
+    
+        retriever = vectorstore.as_retriever(
+            search_type = "mmr",
+            search_kwargs = {"k":k}
+        )
+        results = retriever.invoke(query)
+        return results
+    
+    except ValueError as e:
+        logger.error(f"Value error: {e}")
+        return None
+    
+    except Exception as e:
+        logger.error(f"Error in retriever: {e}")
         return None
