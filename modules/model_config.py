@@ -109,11 +109,18 @@ def create_vector_store(chunks, embedding_model):
 def retrieve(query, vectorstore, k=4):
     
     try:
+        
+        if not query:
+            raise("Query cannot be empty or none")
+        
+        if not vectorstore:
+            raise("VectorStore cannot be empty or none")
     
         retriever = vectorstore.as_retriever(
             search_type = "mmr",
             search_kwargs = {"k":k}
         )
+        
         results = retriever.invoke(query)
         return results
     
