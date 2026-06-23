@@ -67,16 +67,16 @@ def transcript_process(video_url):
         logger.error(f"Error in video fetching: {e}")
     
     
-def format_transcript(trnascript):
+def format_transcript(transcript):
     
     try:
         txt = ""
         
-        if not trnascript:
+        if not transcript:
             raise ValueError("trainscript is empty or none")
         
-        for t in trnascript:
-            txt = f"Text:{t.text} Start: {t.start}"
+        for t in transcript:
+            txt += f"Text:{t.text} Start: {t.start}\n"
         
         if len(txt) == 0:
             logger.warning("Formatted transcript is empty and return None")
@@ -86,8 +86,9 @@ def format_transcript(trnascript):
     
     except ValueError as e:
         logger.error(f"Value error: {e}")
+        return None
     except Exception as e:
         logger.error(f"Error in fomartting the transcript: {e}")
-        return str({e})    
+        return None    
     
     
