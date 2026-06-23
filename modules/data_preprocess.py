@@ -6,7 +6,7 @@ logger = get_logger("data-preprocess-logger")
 def txt_chunking(texts, chunk_size=500, chunk_overlap = 50):
     
     try:
-        if not texts:
+        if not texts or not texts.strip():
             raise ValueError ("Texts are empty or none")
         
         text_splitter = RecursiveCharacterTextSplitter(
@@ -18,7 +18,7 @@ def txt_chunking(texts, chunk_size=500, chunk_overlap = 50):
         split_texts = text_splitter.split_text(texts)
         if not split_texts:
             raise ValueError("error is split texts")
-        logger.info("Texts are splitted sucessfull")
+        logger.info("Texts are splitted successful")
         
         return split_texts
         
@@ -29,3 +29,4 @@ def txt_chunking(texts, chunk_size=500, chunk_overlap = 50):
     except Exception as e:
         logger.error(f"Error in text splitting: {e}")
         return None
+    
