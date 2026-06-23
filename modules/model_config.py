@@ -6,7 +6,6 @@ from langchain_huggingface import HuggingFacePipeline, ChatHuggingFace, HuggingF
 import faiss
 
 
-
 logger = get_logger("model-config-logger")
 
 load_dotenv()
@@ -67,12 +66,18 @@ def embedding_model (model_name=EMBED_MODEL_NAME):
     except Exception as e:
         logger.error(f"Error in embedding model: {e}")
         return None
+    
+embedding = embedding_model()
+dimension = len(embedding.embed_query("test"))
 
 
 def create_vector_index(texts, embedding_model):
     
     try:
-        
+        d = len(texts)
+        index = faiss.IndexHNSWFlat(dimension, 32)
+        index.hnsw.efConstruction = 200
+        index.hnsw.efSearch = 50
         
     except ValueError as e:
         logger.error(f"Value error: {e}")
