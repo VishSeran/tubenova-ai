@@ -1,9 +1,11 @@
 from modules.logger import get_logger
 from dotenv import load_dotenv
 import os
-import requests
 from modules.config import MODEL_NAME,EMBED_MODEL_NAME
 from langchain_huggingface import HuggingFacePipeline, ChatHuggingFace, HuggingFaceEmbeddings
+import faiss
+
+
 
 logger = get_logger("model-config-logger")
 
@@ -66,3 +68,16 @@ def embedding_model (model_name=EMBED_MODEL_NAME):
         logger.error(f"Error in embedding model: {e}")
         return None
 
+
+def create_vector_index(texts, embedding_model):
+    
+    try:
+        
+        
+    except ValueError as e:
+        logger.error(f"Value error: {e}")
+        return None
+    
+    except Exception as e:
+        logger.error(f"Error in create vector index: {e}")
+        return None
