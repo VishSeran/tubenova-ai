@@ -2,7 +2,7 @@ from youtube_transcript_api import YouTubeTranscriptApi
 import re
 from modules.logger import get_logger
 
-logger = get_logger("data-preprocess-logger")
+logger = get_logger("data-extraction-logger")
 
 # import video id 
 def get_video_id (video_url:str):
