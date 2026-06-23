@@ -1,94 +1,32 @@
-from youtube_transcript_api import YouTubeTranscriptApi
-import re
 from modules.logger import get_logger
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 logger = get_logger("data-preprocess-logger")
 
-# import video id 
-def get_video_id (video_url:str):
+def txt_chunking(texts, chunk_size=500, chunk_overlap = 50):
     
     try:
-        if not video_url:
-            raise ValueError("Video url is empty or none")
+        if not texts or not texts.strip():
+            raise ValueError ("Texts are empty or none")
         
-        pattern = r'https:\/\/www\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})'
-        match = re.search(pattern, video_url)
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap
+        )
+        logger.info("Text splitter created")
         
-        return match.group(1) if match else None
-    
-    except ValueError as e:
-        logger.error(f"Value error: {e}")
-    
-    except Exception as e:
-        logger.error(f"Error in get video id: {e}")
+        split_texts = text_splitter.split_text(texts)
+        if not split_texts:
+            raise ValueError("error is split texts")
+        logger.info("Texts are splitted successful")
         
-def transcript_process(video_url):
-    
-    try:    
-        video_id = get_video_id(video_url)
+        return split_texts
         
-        if video_id is None:
-            logger.warning("Video id is None")
-            return None
-        
-        yt_video_api = YouTubeTranscriptApi()
-        fecthed_video =  yt_video_api.list(video_id)
-        
-        if not fecthed_video:
-            raise ValueError("Video is not fetched")
-        
-        logger.info("Video is fetched!")
-        
-        transcript = ""
-        
-        for t in fecthed_video:
-            if t.language_code=='en':
-                if t.is_generated:
-                    if len(transcript) == 0:
-                        transcript = t.fetch()
-                    
-                else:
-                    transcript = t.fetch()
-        
-        if not transcript:
-            logger.warning("Transcript is not fetched")
-            #raise ValueError("Transcript is not fetched")
-            return None
-        
-        logger.info("Transcript has fetched")
-        
-        return transcript 
-        
-    
-    except ValueError as e:
-        logger.error(f"Value error: {e}")
-        
-    except Exception as e:
-        logger.error(f"Error in video fetching: {e}")
-    
-    
-def format_transcript(transcript):
-    
-    try:
-        txt = ""
-        
-        if not transcript:
-            raise ValueError("trainscript is empty or none")
-        
-        for t in transcript:
-            txt += f"Text:{t.text} Start: {t.start}\n"
-        
-        if len(txt) == 0:
-            logger.warning("Formatted transcript is empty and return None")
-            return None    
-        
-        return txt
-    
     except ValueError as e:
         logger.error(f"Value error: {e}")
         return None
-    except Exception as e:
-        logger.error(f"Error in fomartting the transcript: {e}")
-        return None    
     
+    except Exception as e:
+        logger.error(f"Error in text splitting: {e}")
+        return None
     
