@@ -7,6 +7,8 @@ from langchain_community.vectorstores import FAISS
 from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_core.documents import Document
 import faiss
+from huggingface_hub import login
+
 
 
 
@@ -20,6 +22,8 @@ def llm_model(model_name=MODEL_NAME):
         
         if not model_name:
             raise ValueError("model name is empty or none")
+        
+        login(HF_TOKEN)
         
         pipeline_kwargs = {"max_new_tokens": 256}
         
@@ -119,7 +123,7 @@ def save_index(vectorstore, video_id):
     try:
         
         if not video_id:
-            raise ValueError("Video id si not found")
+            raise ValueError("Video id is not found")
         
         path = f"./data/faiss_index/{video_id}"
         os.makedirs(path, exist_ok=True)
