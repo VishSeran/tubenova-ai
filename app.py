@@ -2,6 +2,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_huggingface import ChatHuggingFace
 from modules.logger import get_logger
+import os
 from langchain_classic.globals import set_verbose
 from modules.data_extraction import get_video_id,transcript_process, format_transcript
 from modules.data_preprocess import txt_chunking
@@ -139,23 +140,31 @@ def summary_generate(video_url):
 def ingest_video(video_url):
     
     try:
-        
         video_id = get_video_id(video_url)
+        
+        path = f"./data/faiss_index/{video_id}" 
+        
+        if os.path.exists(path):
+            logger.info("Index already exists")
+            return "Already indexed"
+        
+        else:
 
-        transcript = transcript_process(video_url)
-        logger.info("Transcript fetched")
+            transcript = transcript_process(video_url)
+            logger.info("Transcript fetched")
+            
+            formatted_transcript = format_transcript(transcript)
+            logger.info("Transcript formatted")
+            
+            chunks = txt_chunking(formatted_transcript)
+            logger.info("Chunks fetched")
+            
+            vectorstore = create_vector_store(chunks, embed_model)
+            logger.info("Vector Store is initialized")
+            
+            save_index(vectorstore,video_id)
+            return "Index built successfully"
         
-        formatted_transcript = format_transcript(transcript)
-        logger.info("Transcript formatted")
-        
-        chunks = txt_chunking(formatted_transcript)
-        logger.info("Chunks fetched")
-        
-        vectorstore = create_vector_store(chunks, embed_model)
-        logger.info("Vector Store is initialized")
-        
-        save_index(vectorstore,video_id)
-        return "Index built successfully"
 
     except ValueError as e:
         logger.error(f"Value error: {e}")
@@ -194,7 +203,3 @@ def chat_with_llm(video_url, query):
     except Exception as e:
         logger.error(f"Error in retriever: {e}")
         return None    
-    
-    
-    
-    
