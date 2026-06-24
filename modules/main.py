@@ -11,7 +11,7 @@ set_verbose(True)
 
 logger = get_logger("main-logger")
 
-def summary_generate(process_transcript, llm:ChatHuggingFace):
+def summary_generate_chain(process_transcript, llm:ChatHuggingFace):
     
     try:
         if not process_transcript:
@@ -48,7 +48,7 @@ def summary_generate(process_transcript, llm:ChatHuggingFace):
         return None     
     
 
-def chat_with_llm(query, content, llm:ChatHuggingFace):
+def chat_with_llm_chain(query, content, llm:ChatHuggingFace):
     
     try:
         
@@ -95,7 +95,7 @@ def chat_with_llm(query, content, llm:ChatHuggingFace):
         return None
     
 
-def main(video_url, query):
+def summary_generate(video_url, query):
     
     try:
         if not query:
@@ -106,6 +106,9 @@ def main(video_url, query):
         
         formatted_transcript = format_transcript(transcript)
         logger.info("Transcript formatted")
+        
+        summary = summary_generate_chain(format_transcript)
+        return summary
         
         chunks = txt_chunking(formatted_transcript)
         logger.info("Chunks fetched")
@@ -122,13 +125,7 @@ def main(video_url, query):
             
         logger.info("results retrieved completed")
         
-        
-        
-        
-        
-        
-        
-     
+
     except ValueError as e:
         logger.error(f"Value error: {e}")
         return None
