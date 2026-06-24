@@ -174,26 +174,36 @@ def ingest_video(video_url):
         logger.error(f"Error in saving vector store: {e}")
         return None    
     
+def ingest_and_flag(video_url):
+    
+    result = ingest_video(video_url)
+    return result, True
+    
 
-def chat_with_llm(video_url, query):
+def chat_with_llm(video_url, query, knowledge_ready):
     
     try:
-        video_id = get_video_id(video_url)
-        loaded_vectorstore = load_vector_store(video_id,embed_model)
         
-        if loaded_vectorstore is None:
-            raise ValueError("Vector store loading failed")
+        if not knowledge_ready:
+            return "⚠ Please index the video first (Enable Knowledge)."
         
-        logger.info("Start retrieve process...")
-        retrieve_results = retrieve(query, loaded_vectorstore)
-        
-        if not retrieve_results.strip():
-            return "No relevant information found in video."
+        else:
+            video_id = get_video_id(video_url)
+            loaded_vectorstore = load_vector_store(video_id,embed_model)
             
-        logger.info("results retrieved completed")
+            if loaded_vectorstore is None:
+                raise ValueError("Vector store loading failed")
+            
+            logger.info("Start retrieve process...")
+            retrieve_results = retrieve(query, loaded_vectorstore)
+            
+            if not retrieve_results.strip():
+                return "No relevant information found in video."
+                
+            logger.info("results retrieved completed")
 
-        answer = chat_with_llm_chain(query,retrieve_results)
-        return answer
+            answer = chat_with_llm_chain(query,retrieve_results)
+            return answer
         
 
     except ValueError as e:

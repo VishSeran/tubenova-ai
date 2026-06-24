@@ -1,9 +1,12 @@
 import gradio as gr
-from app import summary_generate, chat_with_llm, ingest_video
+from app import summary_generate, chat_with_llm, ingest_and_flag
+
+
+
 
 def gradio_interface():
     
-    with gr.Blocks as interface:
+    with gr.Blocks() as interface:
         gr.Markdown(
             "<h2 style='text-align: center;'>YouTube Video Summarizer and Q&A</h2>"
         )
@@ -13,7 +16,8 @@ def gradio_interface():
         
         #output summar and answer
         summary_output = gr.Textbox(label="Video Summary", lines=5)
-        ingest_output = gr.HighlightedText(label="Knowledge Status")
+        ingest_output = gr.Textbox(label="Knowledge Status")
+        knowledge_ready = gr.State(False)
         question_input = gr.Textbox(label="Ask a question about the video", placeholder="Ask a question")
         answer_output = gr.Textbox(label="Asnwer to your question", lines=5)
         
@@ -30,14 +34,19 @@ def gradio_interface():
                             outputs=summary_output)
         
         ingest_btn.click(
-            fn=ingest_video,
+            fn=ingest_and_flag,
             inputs=video_url,
-            outputs=ingest_output
+            outputs=[ingest_output, knowledge_ready]
             
         )
         
         question_btn.click(
             fn=chat_with_llm,
-            inputs=[video_url,question_input],
+            inputs=[video_url,question_input, knowledge_ready],
             outputs=answer_output
         )
+        
+    interface.launch(server_name="0.0.0.0", server_port=7860)
+    
+if __name__ == "__main__":
+    gradio_interface()
