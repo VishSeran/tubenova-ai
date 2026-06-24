@@ -57,31 +57,28 @@ def chat_with_llm(query, content, llm:ChatHuggingFace):
         if not content:
             raise ValueError("Video content is empty")
         
-        template = """
-        You are an expert assistant.
 
-        Video Content:
-        {content}
+        prompt_template = ChatPromptTemplate.from_template(
+            """
+            You are an expert assistant.
 
-        Answer the following question using only the information provided in the video content.
+            Video Content:
+            {content}
 
-        Question:
-        {question}
+            Answer the following question using only the information provided in the video content.
 
-        If the answer cannot be found in the video content, respond with:
-        "I don't know based on the provided video content."
+            Question:
+            {question}
+
+            If the answer cannot be found in the video content, respond with:
+            "I don't know based on the provided video content."
         """
-        
-        prompt_template = PromptTemplate(
-            template=template,
-            input_variables=['content', 'question']
-            
         )
         
         chat_chain = prompt_template | llm | StrOutputParser() 
         logger.info("chat chain is created")
         
-        answer = chat_chain.invoke(input={"content": content, "question": query})
+        answer = chat_chain.invoke({"content": content, "question": query})
         
         if len(answer) != 0 :
             logger.info("answer is fetched")
@@ -95,6 +92,9 @@ def chat_with_llm(query, content, llm:ChatHuggingFace):
     except Exception as e:
         logger.error(f"Error in retriever: {e}")
         return None
+    
+
+    
         
     
     
