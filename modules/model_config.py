@@ -7,9 +7,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_core.documents import Document
 import faiss
-from langchain_core.prompts import PromptTemplate
-from langchain_core.output_parsers import StrOutputParser
-from langchain_classic.globals import set_verbose
+
 
 
 logger = get_logger("model-config-logger")
