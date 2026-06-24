@@ -3,10 +3,12 @@ from dotenv import load_dotenv
 import os
 from modules.config import MODEL_NAME,EMBED_MODEL_NAME
 from langchain_huggingface import HuggingFacePipeline, ChatHuggingFace, HuggingFaceEmbeddings
-import faiss
 from langchain_community.vectorstores import FAISS
 from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_core.documents import Document
+import faiss
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
 
 logger = get_logger("model-config-logger")
 
@@ -131,3 +133,36 @@ def retrieve(query, vectorstore, k=4):
     except Exception as e:
         logger.error(f"Error in retriever: {e}")
         return None
+    
+
+def chat_with_llm(query, content, llm:ChatHuggingFace):
+    
+    template = """
+    You are an expert assistant.
+
+    Video Content:
+    {content}
+
+    Answer the following question using only the information provided in the video content.
+
+    Question:
+    {question}
+
+    If the answer cannot be found in the video content, respond with:
+    "I don't know based on the provided video content."
+    """
+    
+    prompt_template = PromptTemplate(
+        template=template,
+        input_variables=['content', 'question']
+        
+    )
+    
+    chat_chain = prompt_template | llm | StrOutputParser()
+    
+    answer = chat_chain.invoke(input={"content": content, "question": query})
+    
+    return answer
+    
+    
+    
