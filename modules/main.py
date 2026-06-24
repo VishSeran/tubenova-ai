@@ -103,12 +103,10 @@ def chat_with_llm_chain(query, content, llm:ChatHuggingFace = chat_llm):
         return None
     
 
-def summary_generate(video_url, query):
+def summary_generate(video_url):
     
     try:
-        if not query:
-            raise ValueError("query is empty")
-
+        
         transcript = transcript_process(video_url)
         logger.info("Transcript fetched")
         
