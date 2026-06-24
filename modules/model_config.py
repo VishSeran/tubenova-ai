@@ -3,10 +3,14 @@ from dotenv import load_dotenv
 import os
 from modules.config import MODEL_NAME,EMBED_MODEL_NAME
 from langchain_huggingface import HuggingFacePipeline, ChatHuggingFace, HuggingFaceEmbeddings
-import faiss
 from langchain_community.vectorstores import FAISS
 from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_core.documents import Document
+import faiss
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_classic.globals import set_verbose
+
 
 logger = get_logger("model-config-logger")
 
@@ -131,3 +135,6 @@ def retrieve(query, vectorstore, k=4):
     except Exception as e:
         logger.error(f"Error in retriever: {e}")
         return None
+    
+set_verbose(True)
+
