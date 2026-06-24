@@ -119,7 +119,7 @@ def save_index(vectorstore, video_id):
     try:
         
         if not video_id:
-            raise ValueError("Video id si not found")
+            raise ValueError("Video id is not found")
         
         path = f"./data/faiss_index/{video_id}"
         os.makedirs(path, exist_ok=True)
