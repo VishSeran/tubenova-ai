@@ -172,6 +172,9 @@ def chat_with_llm(video_url, query):
         video_id = get_video_id(video_url)
         loaded_vectorstore = load_vector_store(video_id,embed_model)
         
+        if loaded_vectorstore is None:
+            raise ValueError("Vector store loading failed")
+        
         logger.info("Start retrieve process...")
         retrieve_results = retrieve(query, loaded_vectorstore)
         
