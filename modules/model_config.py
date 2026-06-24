@@ -9,9 +9,6 @@ from langchain_core.documents import Document
 import faiss
 from huggingface_hub import login
 
-
-
-
 logger = get_logger("model-config-logger")
 
 load_dotenv()
