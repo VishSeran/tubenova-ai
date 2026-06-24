@@ -123,8 +123,9 @@ def save_index(vectorstore, video_id):
         if not video_id:
             raise ValueError("Video id si not found")
         
-        path = "./data/faiss_index/f{video_id}"
-        vectorstore.save.local(path)
+        path = f"./data/faiss_index/{video_id}"
+        os.makedirs(path, exist_ok=True)
+        vectorstore.save_local(path)
     
     except ValueError as e:
         logger.error(f"Value error: {e}")
@@ -136,10 +137,13 @@ def save_index(vectorstore, video_id):
 
 def load_vector_store(video_id, embedding):
     
-    path = "./data/faiss_index/f{video_id}"
+    path = f"./data/faiss_index/{video_id}"
     try:
         if not video_id:
             raise ValueError("Video id si not found")
+        
+        if embedding is None:
+            raise ValueError("Embedding model not loaded")
         
         vector_store = FAISS.load_local(
             path,

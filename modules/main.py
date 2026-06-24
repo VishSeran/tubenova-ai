@@ -170,10 +170,10 @@ def chat_with_llm(video_url, query):
     
     try:
         video_id = get_video_id(video_url)
-        load_vectorestore = load_vector_store(video_id,embed_model)
+        loaded_vectorstore = load_vector_store(video_id,embed_model)
         
         logger.info("Start retrieve process...")
-        retrieve_results = retrieve(query, load_vectorestore)
+        retrieve_results = retrieve(query, loaded_vectorstore)
         
         if not retrieve_results.strip():
             return "No relevant information found in video."
