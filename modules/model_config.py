@@ -23,7 +23,7 @@ def llm_model(model_name=MODEL_NAME):
         if not model_name:
             raise ValueError("model name is empty or none")
         
-        pipeline_kwargs = {"max _new _tokens": 256}
+        pipeline_kwargs = {"max_new_tokens": 256}
         
         pipeline = HuggingFacePipeline.from_model_id (
             model_id=model_name,
@@ -73,13 +73,16 @@ def embedding_model (model_name=EMBED_MODEL_NAME):
         logger.error(f"Error in embedding model: {e}")
         return None
     
-embedding = embedding_model()
-dimension = len(embedding.embed_query("test"))
-
-
-def create_vector_store(chunks, embedding_model):
+    
+def create_vector_store(chunks):
     
     try:
+        
+        if not chunks:
+            raise ValueError("Chunks are empty")
+        
+        embedding = embedding_model()
+        dimension = len(embedding.embed_query("test"))
         
         if not dimension or dimension == 0:
             raise ValueError(f"dimension value is: {dimension}")
@@ -91,7 +94,7 @@ def create_vector_store(chunks, embedding_model):
         docstore = InMemoryDocstore({})
         
         vectorstore = FAISS(
-            embedding_function=embedding_model,
+            embedding_function=embedding,
             index=index,
             docstore=docstore,
             index_to_docstore_id={}
@@ -115,18 +118,19 @@ def retrieve(query, vectorstore, k=4):
     try:
         
         if not query:
-            raise("Query cannot be empty or none")
+            raise ValueError("Query cannot be empty or none")
         
         if not vectorstore:
-            raise("VectorStore cannot be empty or none")
+            raise ValueError("VectorStore cannot be empty or none")
     
         retriever = vectorstore.as_retriever(
             search_type = "mmr",
-            search_kwargs = {"k":k}
+            search_kwargs = {"k":k,"fetch_k": 10}
         )
         
         results = retriever.invoke(query)
-        return results
+        text = "\n".join([doc.page_content for doc in results])
+        return text
     
     except ValueError as e:
         logger.error(f"Value error: {e}")
@@ -136,5 +140,5 @@ def retrieve(query, vectorstore, k=4):
         logger.error(f"Error in retriever: {e}")
         return None
     
-set_verbose(True)
+
 
