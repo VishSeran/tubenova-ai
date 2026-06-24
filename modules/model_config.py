@@ -74,14 +74,13 @@ def embedding_model (model_name=EMBED_MODEL_NAME):
         return None
     
     
-def create_vector_store(chunks):
+def create_vector_store(chunks, embedding):
     
     try:
         
         if not chunks:
             raise ValueError("Chunks are empty")
         
-        embedding = embedding_model()
         dimension = len(embedding.embed_query("test"))
         
         if not dimension or dimension == 0:
@@ -104,7 +103,53 @@ def create_vector_store(chunks):
         vectorstore.add_documents(docs)
         
         return vectorstore
+    
+
         
+    except ValueError as e:
+        logger.error(f"Value error: {e}")
+        return None
+    
+    except Exception as e:
+        logger.error(f"Error in create vector index: {e}")
+        return None
+    
+    
+    
+def save_index(vectorstore, video_id):
+    
+    try:
+        
+        if not video_id:
+            raise ValueError("Video id si not found")
+        
+        path = "./data/faiss_index/f{video_id}"
+        vectorstore.save.local(path)
+    
+    except ValueError as e:
+        logger.error(f"Value error: {e}")
+        return None
+    
+    except Exception as e:
+        logger.error(f"Error in create vector index: {e}")
+        return None     
+
+def load_vector_store(video_id, embedding):
+    
+    path = "./data/faiss_index/f{video_id}"
+    try:
+        if not video_id:
+            raise ValueError("Video id si not found")
+        
+        vector_store = FAISS.load_local(
+            path,
+            embedding,
+            allow_dangerous_deserialization=True
+        )
+        
+        logger.info("Index loaded successfull")
+        return vector_store
+
     except ValueError as e:
         logger.error(f"Value error: {e}")
         return None
