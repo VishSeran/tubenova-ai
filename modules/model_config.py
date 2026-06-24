@@ -77,7 +77,7 @@ embedding = embedding_model()
 dimension = len(embedding.embed_query("test"))
 
 
-def create_vector_store(chunks, embedding_model):
+def create_vector_store(chunks, embedding_model = embedding_model):
     
     try:
         
@@ -136,5 +136,5 @@ def retrieve(query, vectorstore, k=4):
         logger.error(f"Error in retriever: {e}")
         return None
     
-set_verbose(True)
+
 
