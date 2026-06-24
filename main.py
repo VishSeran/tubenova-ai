@@ -1,9 +1,6 @@
 import gradio as gr
 from app import summary_generate, chat_with_llm, ingest_and_flag
 
-
-
-
 def gradio_interface():
     
     with gr.Blocks() as interface:
@@ -26,7 +23,7 @@ def gradio_interface():
         ingest_btn = gr.Button("Enable Knowledge")
         question_btn = gr.Button("Ask a Question")
         
-        transcript_sts = gr.Textbox(label="Transcript Status", interactive=False)
+        #transcript_sts = gr.Textbox(label="Transcript Status", interactive=False)
         
         #setup button actions
         summarize_btn.click(fn=summary_generate,
@@ -46,7 +43,7 @@ def gradio_interface():
             outputs=answer_output
         )
         
-    interface.launch(server_name="0.0.0.0", server_port=7860)
+    interface.launch()
     
 if __name__ == "__main__":
     gradio_interface()

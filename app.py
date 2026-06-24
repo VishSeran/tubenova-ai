@@ -3,6 +3,8 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_huggingface import ChatHuggingFace
 from modules.logger import get_logger
 import os
+from dotenv import load_dotenv
+from huggingface_hub import login
 from langchain_classic.globals import set_verbose
 from modules.data_extraction import get_video_id,transcript_process, format_transcript
 from modules.data_preprocess import txt_chunking
@@ -10,15 +12,19 @@ from modules.model_config import llm_model, create_vector_store, retrieve,embedd
 
 set_verbose(True)
 
-logger = get_logger("main-logger")
+logger = get_logger("app-logger")
+
+load_dotenv()
+HF_TOKEN = os.getenv("HF_TOKEN")
+
 
 logger.info("LLM model initializing...")
 chat_llm = llm_model()
         
 if not chat_llm:
     logger.warning("LLM model init failed")
-        
-logger.info("LLM model loaded successfull")
+else:      
+    logger.info("LLM model loaded successfull")
 
 
 logger.info("Embedding model initializing...")
