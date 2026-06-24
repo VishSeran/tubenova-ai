@@ -1,5 +1,5 @@
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import PromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_huggingface import ChatHuggingFace
 from modules.logger import get_logger
 from langchain_classic.globals import set_verbose
@@ -14,27 +14,27 @@ def summary_generate(process_transcript, llm:ChatHuggingFace):
         if not process_transcript:
             raise ValueError("transcript is empty")
         
-        template = """
-            <|begin_of_text|><|start_header_id|>system<|end_header_id|>
-            You are an AI assistant tasked with summarizing YouTube video transcripts
-            Instructions:
-            
-            1. Summarize the transcript in a single concise paragraph.
-            2. Ignore any timestamps in your summary.
-            3. Focus on the spoken content (Text) of the video.
-            
-            Note: In the transcript, "Text" refers to the spoken words in the video,
-            Please summarize the following YouTube video transcript:
-            
-            {transcript}<|eot_id|><|start_header_id|>assistant<|end_header_id|>
-        """
-        
-        prompt_template = PromptTemplate(
-            template=template,
-            input_variables=['transcript']
+        prompt_template = ChatPromptTemplate.from_template(
+            """
+            You are an AI assistant tasked with summarizing YouTube video transcripts.
+
+            Summarize the transcript in one concise paragraph.
+            Ignore timestamps and focus only on spoken content.
+
+            Transcript:
+            {transcript}
+            """
+
         )
         
         summary_chain = prompt_template | llm | StrOutputParser()
+        logger.info("Summaru chain is created")
+        
+        summary = summary_chain.invoke({"transcript": process_transcript})
+        if len(summary) != 0 :
+            logger.info("answer is fetched")
+        
+        return summary
         
         
         
@@ -84,7 +84,7 @@ def chat_with_llm(query, content, llm:ChatHuggingFace):
         answer = chat_chain.invoke(input={"content": content, "question": query})
         
         if len(answer) != 0 :
-            logger.info("chat chain is created")
+            logger.info("answer is fetched")
         
         return answer
     
